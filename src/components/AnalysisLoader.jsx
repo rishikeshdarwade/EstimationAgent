@@ -124,7 +124,7 @@ export default function AnalysisLoader() {
         />
         <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 0.5 }}>
           <Typography variant="caption" color="text.disabled">
-            Analysing…
+            In Progress…
           </Typography>
           <Typography variant="caption" color="text.disabled">
             {Math.round(progress)}%
