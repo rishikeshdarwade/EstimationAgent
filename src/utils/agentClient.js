@@ -83,12 +83,17 @@ function normaliseEstimation(est) {
     estimated_hours: wbsHoursLower[role.toLowerCase()] ?? 0,
   }))
 
-  // Normalise complexity
+  // Normalise complexity — API returns either:
+  //   a string:  "Simple" | "Medium" | "Complex"
+  //   an object: { classification: "Medium", justification: "..." }
   const complexityRaw = est.complexity ?? {}
-  const complexity_assessment = {
-    tier: complexityRaw.classification ?? complexityRaw.tier ?? '—',
-    justification: complexityRaw.justification ?? '',
-  }
+  const complexity_assessment =
+    typeof complexityRaw === 'string'
+      ? { tier: complexityRaw, justification: est.architectural_justification ?? '' }
+      : {
+          tier: complexityRaw.classification ?? complexityRaw.tier ?? '—',
+          justification: complexityRaw.justification ?? est.architectural_justification ?? '',
+        }
 
   // Normalise historical benchmarks
   const historical_benchmarks = (est.historical_benchmarks ?? []).map((b) => ({

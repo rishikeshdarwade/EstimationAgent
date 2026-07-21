@@ -102,9 +102,9 @@ export default function AnalysisLoader() {
         </Typography>
       </Fade>
 
-      {/* Sub-label */}
+      {/* Sub-label — no step count, just branding */}
       <Typography variant="body2" color="text.secondary" sx={{ mb: 3 }}>
-        Stage {stageIndex + 1} of {STAGES.length} · IBM Plains Runtime Rebels Estimation Engine
+        IBM Plains Runtime Rebels Estimation Engine
       </Typography>
 
       {/* Progress bar */}

@@ -13,6 +13,7 @@ import TableCell from '@mui/material/TableCell'
 import TableContainer from '@mui/material/TableContainer'
 import TableHead from '@mui/material/TableHead'
 import TableRow from '@mui/material/TableRow'
+import TableSortLabel from '@mui/material/TableSortLabel'
 import Paper from '@mui/material/Paper'
 import IconButton from '@mui/material/IconButton'
 import Collapse from '@mui/material/Collapse'
@@ -28,6 +29,33 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack'
 import DownloadIcon from '@mui/icons-material/Download'
 import SmartToyIcon from '@mui/icons-material/SmartToy'
 import { exportToExcel } from '../utils/exportToExcel.js'
+
+// Sortable column definitions — key maps to a value extractor on each estimation
+const SORT_COLUMNS = {
+  requirement_id:    (e) => e.requirement_id ?? '',
+  title:             (e) => e.title ?? '',
+  complexity:        (e) => e.complexity_assessment?.tier ?? '',
+  confidence:        (e) => e.confidence_score ?? 0,
+  total_hours:       (e) => e.total_estimated_hours ?? 0,
+  ...Object.fromEntries(
+    ['Frontend','Backend','Security','Architect','Testing','Deployment','Integration'].map(
+      (role) => [role, (e) => e.wbs_allocation?.find((w) => w.role === role)?.estimated_hours ?? 0]
+    )
+  ),
+}
+
+function applySort(rows, orderBy, order) {
+  if (!orderBy) return rows
+  const extractor = SORT_COLUMNS[orderBy]
+  if (!extractor) return rows
+  return [...rows].sort((a, b) => {
+    const av = extractor(a)
+    const bv = extractor(b)
+    if (av < bv) return order === 'asc' ? -1 : 1
+    if (av > bv) return order === 'asc' ? 1 : -1
+    return 0
+  })
+}
 
 // WBS roles displayed as table columns — order is fixed
 const WBS_ROLES = ['Frontend', 'Backend', 'Security', 'Architect', 'Testing', 'Deployment', 'Integration']
@@ -208,6 +236,24 @@ function EstimationRow({ est }) {
 export default function DashboardScreen({ data, onReset }) {
   const { estimations = [], summary_text = '', context_id } = data
 
+  // Sort state
+  const [orderBy, setOrderBy] = useState('')
+  const [order, setOrder]     = useState('asc')
+
+  const handleSort = (col) => {
+    if (orderBy === col) {
+      setOrder((o) => o === 'asc' ? 'desc' : 'asc')
+    } else {
+      setOrderBy(col)
+      setOrder('asc')
+    }
+  }
+
+  const sortedEstimations = useMemo(
+    () => applySort(estimations, orderBy, order),
+    [estimations, orderBy, order]
+  )
+
   // Derived KPI values
   const { totalHours, avgConfidence, complexityCounts } = useMemo(() => {
     const totalHours = estimations.reduce((sum, e) => sum + (e.total_estimated_hours ?? 0), 0)
@@ -341,20 +387,38 @@ export default function DashboardScreen({ data, onReset }) {
             <TableHead>
               <TableRow sx={{ '& th': { fontWeight: 700, bgcolor: 'grey.100' } }}>
                 <TableCell padding="checkbox" />
-                <TableCell>Req ID</TableCell>
-                <TableCell>Title</TableCell>
-                <TableCell>Complexity</TableCell>
-                <TableCell align="right">Confidence</TableCell>
-                <TableCell align="right">Total Hrs</TableCell>
+                {[
+                  { id: 'requirement_id', label: 'Req ID',     align: 'left'  },
+                  { id: 'title',          label: 'Title',      align: 'left'  },
+                  { id: 'complexity',     label: 'Complexity', align: 'left'  },
+                  { id: 'confidence',     label: 'Confidence', align: 'right' },
+                  { id: 'total_hours',    label: 'Total Hrs',  align: 'right' },
+                ].map((col) => (
+                  <TableCell key={col.id} align={col.align}>
+                    <TableSortLabel
+                      active={orderBy === col.id}
+                      direction={orderBy === col.id ? order : 'asc'}
+                      onClick={() => handleSort(col.id)}
+                    >
+                      {col.label}
+                    </TableSortLabel>
+                  </TableCell>
+                ))}
                 {WBS_ROLES.map((role) => (
                   <TableCell key={role} align="right">
-                    {role}
+                    <TableSortLabel
+                      active={orderBy === role}
+                      direction={orderBy === role ? order : 'asc'}
+                      onClick={() => handleSort(role)}
+                    >
+                      {role}
+                    </TableSortLabel>
                   </TableCell>
                 ))}
               </TableRow>
             </TableHead>
             <TableBody>
-              {estimations.map((est) => (
+              {sortedEstimations.map((est) => (
                 <EstimationRow key={est.requirement_id} est={est} />
               ))}
             </TableBody>
