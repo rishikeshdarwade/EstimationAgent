@@ -100,7 +100,7 @@ export default function UploadScreen({ onResult, isLoading, onLoadingChange }) {
       {/* ── Page heading ── */}
       <Box sx={{ mb: 4, textAlign: 'center' }}>
         <Typography variant="h4" fontWeight={700} gutterBottom>
-          Managed Capacity Estimation
+          Efforts Estimation Workbench
         </Typography>
         <Typography variant="body1" color="text.secondary">
           Upload a requirements document to generate an AI-powered WBS estimation.

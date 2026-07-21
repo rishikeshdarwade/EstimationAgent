@@ -25,7 +25,7 @@
 - API key management: **Hard-coded in a dedicated config file** (`src/config.js`) with a comment marking it for future environment variable migration
 - API response handling: **Defensive mixed-response parsing** — the API returns summary prose followed by a JSON block; the frontend scans the response text, extracts the outermost JSON block using a brace-counting scan, captures the prose before it as `summary_text`
 - Excel export format: **Two-tab workbook** (Executive Summary + WBS Detail)
-- Branding: **"Estimation Solution — IBM Plains Runtime Rebels"**
+- Branding: **"Efforts Estimation Workbench — IBM Plains Runtime Rebels"**
 - Build tool: **Vite + React** (fast builds, straightforward static output in `dist/`)
 
 ---
@@ -149,7 +149,7 @@ Set up the React application shell: MUI global theme, persistent `AppBar` with b
 - A MUI theme with IBM Carbon Blue (`#0f62fe`) as the primary colour.
 - `App.jsx` holds two state values: `estimationResult` (null or the response object) and `isLoading` (boolean).
 - A persistent `<AppBar>` visible on both screens displaying:
-  - Primary line: **"Estimation Solution"** (Typography h6)
+  - Primary line: **"Efforts Estimation Workbench"** (Typography h6)
   - Secondary line: **"IBM Plains Runtime Rebels"** (Typography caption)
 - Conditional rendering: `<UploadScreen>` when `estimationResult === null`, `<DashboardScreen>` otherwise.
 

@@ -1,4 +1,4 @@
-# Estimation Solution — IBM Plains Runtime Rebels
+# Efforts Estimation Workbench — IBM Plains Runtime Rebels
 
 A fully client-side React web application for AI-powered software estimation.  
 Upload a requirements document (BRD, Enhancement Tracker, or User Story) and receive an interactive WBS estimation dashboard powered by IBM watsonx Agentic Studio.

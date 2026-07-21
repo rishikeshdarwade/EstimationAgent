@@ -38,7 +38,7 @@ function App() {
           <AppLogo />
           <Box sx={{ display: 'flex', flexDirection: 'column' }}>
             <Typography variant="h6" component="div" sx={{ fontWeight: 700, lineHeight: 1.2 }}>
-              Estimation Solution
+              Efforts Estimation Workbench
             </Typography>
             <Typography variant="caption" component="div" sx={{ opacity: 0.85, letterSpacing: '0.04em' }}>
               IBM Plains Runtime Rebels
