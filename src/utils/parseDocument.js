@@ -54,12 +54,30 @@ async function parseDocument(file) {
 
   if (ext === 'xlsx' || ext === 'xls') {
     const arrayBuffer = await readAsArrayBuffer(file)
-    // XLSX.read expects a Uint8Array or ArrayBuffer
     const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' })
+
     const sheetTexts = workbook.SheetNames.map((sheetName) => {
       const sheet = workbook.Sheets[sheetName]
-      return `=== Sheet: ${sheetName} ===\n${XLSX.utils.sheet_to_csv(sheet)}`
-    })
+
+      // Use sheet_to_json with defval='' to correctly handle merged/multi-row cells.
+      // sheet_to_csv produces empty rows (,,,,) for spanned cells which confuses the agent.
+      const rows = XLSX.utils.sheet_to_json(sheet, { defval: '' })
+
+      if (rows.length === 0) return null
+
+      // Format each row as a labelled block: "ColumnName: value" per field.
+      // Empty values are skipped so the agent sees only meaningful content.
+      const blocks = rows.map((row, i) => {
+        const fields = Object.entries(row)
+          .filter(([, v]) => v !== '' && v !== null && v !== undefined)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join('\n')
+        return fields ? `[Record ${i + 1}]\n${fields}` : null
+      }).filter(Boolean)
+
+      return `=== Sheet: ${sheetName} ===\n\n${blocks.join('\n\n')}`
+    }).filter(Boolean)
+
     return sheetTexts.join('\n\n')
   }
 
