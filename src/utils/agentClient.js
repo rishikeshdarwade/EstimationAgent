@@ -1,6 +1,13 @@
-// The API call is proxied through Vite's dev server middleware (vite.config.js)
-// to avoid browser CORS restrictions. The proxy injects the x-api-key server-side.
-const PROXY_URL = '/api/proxy'
+// Route API calls:
+//   - Development (npm run dev): through the Vite middleware proxy at /api/proxy
+//   - Production (GitHub Pages): through the deployed Cloudflare Worker
+//
+// import.meta.env.DEV is true during `npm run dev`, false in `npm run build`
+// import.meta.env.VITE_WORKER_URL can be set in a .env.production file once
+// the Worker is deployed.
+const PROXY_URL = import.meta.env.DEV
+  ? '/api/proxy'
+  : (import.meta.env.VITE_WORKER_URL || '/api/proxy')
 
 /**
  * Extracts summary prose and the JSON block from the agent's text field.

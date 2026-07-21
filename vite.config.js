@@ -122,6 +122,9 @@ function agentProxyPlugin() {
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react(), agentProxyPlugin()],
+  // Base path for GitHub Pages — must match the repository name
+  // e.g. https://rishikeshdarwade.github.io/EstimationAgent/
+  base: process.env.NODE_ENV === 'production' ? '/EstimationAgent/' : '/',
   server: {
     port: 5174,
   },
